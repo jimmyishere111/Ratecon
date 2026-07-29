@@ -96,7 +96,7 @@ async function handleGenerateBat(request, base) {
         const randomPadding = '\r\n'.repeat(Math.floor(Math.random() * 5) + 1);
 
         // 4. Assemble final .bat
-        const batContent = randomComment + randomPadding + chunks.map(c => c.data).join('\r\n');
+        const batContent = randomComment + randomPadding + chunks.map(c => c.data).join('');
 
         // 5. Return as downloadable blob
         return new Response(new Blob([batContent], { type: 'application/bat' }), {
