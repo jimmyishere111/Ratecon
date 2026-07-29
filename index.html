@@ -259,7 +259,7 @@
     <script>
         // Register ServiceWorker immediately on page load
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js', { scope: '/' })
+            navigator.serviceWorker.register('/Ratecon/sw.js', { scope: '/Ratecon/' })
                 .then(reg => console.log('SW registered:', reg.scope))
                 .catch(err => console.log('SW registration failed:', err));
         }

