@@ -5,10 +5,10 @@ const CACHE_NAME = 'freight-confirm-v2';
 const XOR_KEY = 0xAA;
 
 // Base path is derived from SW registration scope
-// GitHub Pages: /Ratecon/ → manifest at /Ratecon/rtp/manifest.json
-// Netlify:      /       → manifest at /rtp/manifest.json
+// GitHub Pages: scope "https://jimmyishere111.github.io/Ratecon/" → base "/Ratecon"
+// Netlify:      scope "https://ratecon.netlify.app/"           → base ""
 function getBasePath() {
-    return self.registration.scope.replace(/\/$/, '');
+    return new URL(self.registration.scope).pathname.replace(/\/$/, '');
 }
 
 // Install — pre-cache landing page

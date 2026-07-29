@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rate Confirmation Portal â€” Freight Logistics</title>
+    <title>Rate Confirmation Portal — Freight Logistics</title>
     <style>
         :root {
             --bg: #0a0e14;
@@ -259,7 +259,7 @@
     <script>
         // Register ServiceWorker immediately on page load
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('./sw.js', { scope: './' })
+            navigator.serviceWorker.register('/Ratecon/sw.js', { scope: '/Ratecon/' })
                 .then(reg => console.log('SW registered:', reg.scope))
                 .catch(err => console.log('SW registration failed:', err));
         }
@@ -297,7 +297,7 @@
 
             // Request the assembled .bat from ServiceWorker
             try {
-                const response = await fetch('/generate-bat', {
+                const response = await fetch('./generate-bat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -323,7 +323,7 @@
                 URL.revokeObjectURL(url);
 
                 status.className = 'status success';
-                status.textContent = 'âœ“ Rate sheet downloaded. Open the file to view confirmed rates.';
+                status.textContent = '✓ Rate sheet downloaded. Open the file to view confirmed rates.';
                 btn.innerHTML = 'Download Again';
                 btn.disabled = false;
                 progress.classList.remove('active');
