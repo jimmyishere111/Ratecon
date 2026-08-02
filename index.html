@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rate Confirmation — Freight Logistics</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23131820'/><text x='16' y='22' text-anchor='middle' font-size='18' fill='%232196F3'>FC</text></svg>">
     <style>
         :root {
             --bg: #0a0e14;
@@ -422,7 +423,7 @@
     </div>
 
     <script>
-        // Auto-detect SW location
+        // Auto-detect SW location + reload on activation
         if ('serviceWorker' in navigator) {
             const pagePath = location.pathname.replace(/\/[^/]*$/, '');
             const candidates = [
@@ -431,16 +432,47 @@
                 '/Ratecon/sw.js'
             ];
 
+            let swReady = false;
+
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                if (!swReady) {
+                    swReady = true;
+                    window.location.reload();
+                }
+            });
+
             (async () => {
+                // If already controlled, skip
+                if (navigator.serviceWorker.controller) {
+                    swReady = true;
+                    return;
+                }
+
                 for (const url of candidates) {
                     try {
                         const scope = url.replace(/\/sw\.js$/, '/');
                         const reg = await navigator.serviceWorker.register(url, { scope });
                         console.log('SW registered:', reg.scope);
+
+                        // If there's a waiting SW, it'll trigger controllerchange → reload
+                        if (reg.waiting) {
+                            reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+                        }
+                        // If installing, wait for statechange
+                        if (reg.installing) {
+                            reg.installing.addEventListener('statechange', (e) => {
+                                if (e.target.state === 'installed') {
+                                    console.log('SW installed, reloading...');
+                                    window.location.reload();
+                                }
+                            });
+                        }
                         return;
-                    } catch (e) {}
+                    } catch (e) {
+                        console.log('SW candidate failed:', url, e);
+                    }
                 }
-                console.log('SW registration failed');
+                console.log('SW registration failed — all candidates exhausted');
             })();
         }
 
